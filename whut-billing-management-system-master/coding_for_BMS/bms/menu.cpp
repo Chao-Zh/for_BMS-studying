@@ -1,0 +1,686 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <iostream>
+#include <locale.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ctime>
+#include <cstring>
+
+#include "model.h"
+#include "menu.h"
+#include "card_service.h"
+#include "global.h"
+#include "tool.h"
+#include "service.h"
+
+using namespace std;
+
+// 函数名:outputMenu
+// 功能:输出系统菜单
+// 参数:void
+// 返回值:void
+void outputMenu()
+{ // 输出系统菜单
+	printf("\n");
+	printf("------计费系统菜单------\n");
+	printf("*                      *\n");
+	printf("*       1.添加卡       *\n");
+	printf("*       2.查询卡       *\n");
+	printf("*       3.上机         *\n");
+	printf("*       4.下机         *\n");
+	printf("*       5.充值         *\n");
+	printf("*       6.退费         *\n");
+	printf("*       7.查询统计     *\n");
+	printf("*       8.注销卡       *\n");
+	printf("*       0.退出         *\n");
+	printf("------------------------\n\n");
+}
+
+// 函数名:add
+// 功能:添加用户卡信息到卡结构体变量，并屏幕显示
+// 参数:void
+// 返回值:void
+void add()
+{
+    Card card = {}; // 零初始化
+    char name[30];
+    char pwd[20];
+
+    // 输入卡号
+    printf("请输入卡号(长度1~18):");
+    scanf("%18s", name);
+    if (strlen(name) >= 18) {
+        printf("卡号过长！\n");
+        return;
+    }
+    if (queryCardInfo(name)) {
+        printf("卡号已存在！\n");
+        return;
+    }
+    strncpy(card.aName, name, sizeof(card.aName)-1);
+
+    // 输入密码
+    printf("请输入密码(长度1~8):");
+    scanf("%8s", pwd);
+    strncpy(card.aPwd, pwd, sizeof(card.aPwd)-1);
+
+    // 输入金额
+    printf("请输入开卡金额(RMB)：");
+    scanf("%f", &card.fBalance);
+
+	
+// 初始化时间字段
+card.tStart = time(NULL);  // 开卡时间设为当前时间
+card.tLastTime = card.tStart;
+
+// 计算截止时间（当前时间 + 1年）
+struct tm tm_start;
+struct tm tm_end;
+
+// 将当前时间转换为本地时间结构体
+if (!localtime_r(&card.tStart, &tm_start)) {
+    perror("时间转换失败");
+    return;
+}
+
+// 复制时间结构体并增加1年
+tm_end = tm_start;
+tm_end.tm_year += 1;  // tm_year 是自1900的年数
+
+// 自动修正非法日期（如2月29日加1年后变为3月1日）
+card.tEnd = mktime(&tm_end);
+if (card.tEnd == -1) {
+    perror("无效的截止时间");
+    return;
+}
+
+// 验证截止时间
+struct tm tm_check;
+if (!localtime_r(&card.tEnd, &tm_check)) {
+    perror("截止时间转换失败");
+    return;
+}
+
+    // 输出信息
+    printf("----------------添加的卡信息如下----------------\n");
+    //printf("卡号\t密码\t状态\t开卡金额\n");
+	printf("%-*s%-*s%-*s%-*s\n", 
+    CARD_NO_WIDTH, "卡号", 
+    PWD_WIDTH, "密码", 
+    STATUS_WIDTH, "状态", 
+    INIT_BALANCE_WIDTH, "开卡金额");
+    //printf("%s\t%s\t%d\t%.2f\n", card.aName, card.aPwd, card.nStatus, card.fBalance);
+	printf("%-*s%-*s%-*d%-*.2f\n",
+    CARD_NO_WIDTH, card.aName,
+    PWD_WIDTH, card.aPwd,
+    STATUS_WIDTH, card.nStatus,
+    INIT_BALANCE_WIDTH, card.fBalance);
+    printf("--------------------------------------------------\n");
+
+    // 保存到文件
+    if (!addCardInfo(card)) {
+        printf("添加失败！\n");
+    } else {
+        printf("添加成功！\n");
+    }
+}
+
+// 函数名:getSize
+// 功能:计算字符数组中字符长度
+// 参数:字符数组名
+// 返回值:字符个数
+int getSize(const char *pString)
+{
+	int nSize = 0;
+	// 计算字符串的字符个数
+	while (*(pString + nSize) != '\0')
+	{
+		nSize++;
+	}
+	// 返回字符个数
+	return nSize;
+}
+
+// 函数名:query
+// 功能:根据输入的卡号调用，查询是否有该卡，有的话，输出卡信息
+// 参数:void
+// 返回值:void
+void query()
+{
+	char name[18]; // 存放要查询的用户名
+	Card *pCard = NULL;
+	char aLastTime[30]; // 存放指定格式字符串的时间
+	int icha = 0;
+	int nIndex = 0;
+	int i; // 查询到卡信息数量
+
+	printf("请输入要查询的卡号(长度1~18):");
+	scanf("%18s", name);
+
+	printf("1.精确查询||2.模糊查询(输入1或2)：");
+	scanf("%d", &icha);
+
+	if (icha == 1)
+	{
+		pCard = queryCardInfo(name);
+	}
+	else if (icha == 2)
+	{
+		pCard = queryCardsInfo(name, &nIndex);
+	}
+	else
+	{
+		do
+		{
+			printf("输入错误！\n请重新输入：");
+			scanf("%d", &icha);
+		} while (icha != 1 && icha != 2);
+		if (icha == 1)
+		{
+			pCard = queryCard(name);
+		}
+		else if (icha == 2)
+		{
+			pCard = queryCards(name, &nIndex);
+		}
+	}
+
+	if (pCard == NULL)
+	{
+		printf("----*****-----没有该卡的信息！-----*****----\n");
+	}
+	else
+	{
+		if (icha == 1)
+		{
+			printf("-------------******-------------查询到的卡信息如下-------------******-------------\n");
+			// 输出表格的表头
+			//printf("卡号\t状态\t余额\t累计金额\t使用次数\t上次使用时间\n");
+			printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
+    		CARD_NO_WIDTH, "卡号", 
+    		STATUS_WIDTH, "状态", 
+    		BALANCE_WIDTH, "余额", 
+    		COL_TOTAL_USE, "累计金额", 
+    		COL_USE_COUNT, "使用次数", 
+    		TIME_WIDTH, "上次使用时间");
+
+			// 将time_t类型时间转换为字符串，字符串格式为“年-月-日 时：分”
+			timeToString(pCard->tLastTime, aLastTime);
+			// 输出查到的卡信息
+			//printf("%s\t%d\t%.2f\t%.2f\t%10d\t\t%s\n", pCard->aName, pCard->nStatus, pCard->fBalance, pCard->fTotalUse, pCard->nUseCount, aLastTime);
+			printf("%-*s%-*d%-*.2f%-*.2f%-*d%-*s\n",
+        	CARD_NO_WIDTH, pCard->aName,
+        	STATUS_WIDTH, pCard->nStatus,
+        	BALANCE_WIDTH, pCard->fBalance,
+        	COL_TOTAL_USE, pCard->fTotalUse,
+        	COL_USE_COUNT, pCard->nUseCount,
+        	TIME_WIDTH, aLastTime);
+			printf("----------------------------------------------------------------------------------\n");
+		}
+		else // 模糊查询结果输出
+		{
+			printf("-------------******-------------查询到的卡信息如下-------------******-------------\n");
+			// 输出表格的表头
+			//printf("卡号\t状态\t余额\t累计金额\t使用次数\t上次使用时间\n");
+			printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
+    		CARD_NO_WIDTH, "卡号", 
+    		STATUS_WIDTH, "状态", 
+    		BALANCE_WIDTH, "余额", 
+    		COL_TOTAL_USE, "累计金额", 
+    		COL_USE_COUNT, "使用次数", 
+    		TIME_WIDTH, "上次使用时间");
+
+			for (i = 0; i < nIndex; i++)
+			{
+				// 将time_t类型时间转化为字符串，字符串格式为"年-月-日 时：分"
+				timeToString(pCard[i].tLastTime, aLastTime); // 结构体指针当数组名用
+
+				// 输出查询到的卡信息
+				//printf("%s\t%d\t%.2f\t%.2f\t%10d\t\t%s\n", pCard[i].aName, pCard[i].nStatus, pCard[i].fBalance, pCard[i].fTotalUse, pCard[i].nUseCount, aLastTime);
+				printf("%-*s%-*d%-*.2f%-*.2f%-*d%-*s\n",
+        		CARD_NO_WIDTH, pCard[i].aName,
+        		STATUS_WIDTH, pCard[i].nStatus,
+        		BALANCE_WIDTH, pCard[i].fBalance,
+        		COL_TOTAL_USE, pCard[i].fTotalUse,
+        		COL_USE_COUNT, pCard[i].nUseCount,
+        		TIME_WIDTH, aLastTime);
+				printf("----------------------------------------------------------------------------------\n");
+			}
+
+			// 释放动态分配的内存
+			free(pCard);
+		}
+		pCard = NULL;
+	}
+}
+
+// 函数名:exitApp
+// 功能:退出应用程序
+// 参数:void
+// 返回值:void
+void exitApp()
+{
+	releaseList();
+}
+
+// 函数名:logon
+// 功能:输入上机卡信息，查询到，输出上机卡信息
+// 参数:void
+// 返回值:void
+void logon()
+{
+	char aName[30] = {0}; // 上机卡号
+	char aPwd[20] = {0};  // 上机密码
+	char aLastTime[30];	  // 存放指定格式字符串的时间
+	LogonIofo *pInfo = NULL;
+	int nResult = 0;
+
+	// 提示并接受上机卡号
+	printf("请输入上机的卡号（长度为0~18）：");
+	scanf("%30s", aName);
+	// 判断输入的卡号是否符合要求
+	if (getSize(aName) >= 18)
+	{
+		printf("输入的卡号长度超过最大值！\n");
+		return;
+	}
+	// 提示并接受上机密码
+	printf("请输入上机密码（长度为1~8）：");
+	scanf("%20s", aPwd);
+	// 判断输入的密码是否符合要求
+	if (getSize(aPwd) >= 8)
+	{
+		printf("输入的密码长度超过最大值！\n");
+		return;
+	}
+	// 开始上机，获取上机结果
+	pInfo = (LogonInfo *)malloc(sizeof(LogonInfo));
+	if (pInfo == NULL)
+	{
+		exit(1);
+	}
+	// 根据上机结果，提示不同信息
+	nResult = doLogon(aName, aPwd, pInfo);
+
+	switch (nResult)
+	{
+	case 0:
+		printf("上机失败!\n");
+		break;
+	case 1:
+		printf("------***------上机信息如下------***------\n");
+		// 输出表格的表头
+		//printf("卡号\t余额\t上机时间\n");
+		printf("%-*s%-*s%-*s\n",
+    	CARD_NO_WIDTH, "卡号",
+    	BALANCE_WIDTH, "余额",
+    	TIME_WIDTH, "上机时间");
+
+		// 将time_t类型时间转化为字符串，字符串格式为“年-月-日 时：分”
+		timeToString(pInfo->tLogon, aLastTime); // 结构指针当数组名使用
+		// 输出上机卡信息
+		printf("%-*s%-*.2f%-*s\n",
+    CARD_NO_WIDTH, pInfo->aCardName,
+    BALANCE_WIDTH, pInfo->fBalance,
+    TIME_WIDTH, aLastTime);
+		//printf("%s\t%.2f\t%s\n", pInfo->aCardName, pInfo->fBalance, aLastTime);
+		
+		printf("------------------------------------------\n");
+		printf("---------上机成功！---------\n");
+		break;
+	case 2:
+		printf("---------该卡不能使用!---------\n");
+		break;
+	case 3:
+		printf("---------余额不足！---------\n");
+		break;
+	}
+	// 释放上机信息
+	free(pInfo);
+}
+
+// 函数名:settle
+// 功能:输入下机卡信息，查询到输出上机卡信息
+// 参数:void
+// 返回值:void
+void settle()
+{
+	char aName[18] = {0};	   // 卡号
+	char aPwd[8] = {0};		   // 密码
+	int nResult = -1;		   // 下机结果
+	SettleInfo *pInfo = NULL;  // 下机卡信息
+	char aStartTime[30] = {0}; // 上机时间
+	char aEndTime[30] = {0};   // 下机时间
+
+	// 为下机信息动态分配内存
+	pInfo = (SettleInfo *)malloc(sizeof(SettleInfo));
+	if (pInfo == 0)
+	{
+		exit(1);
+	}
+	printf("请输入下机卡号（长度1~18）：");
+	scanf("%18s", aName);
+	// 判断输入的卡号是否符合要求
+	if (getSize(aName) >= 18)
+	{
+		printf("输入的卡号长度超过最大值！\n");
+		return;
+	}
+
+	printf("请输入下机密码（长度1~8）:");
+	scanf("%8s", aPwd);
+	// 判断输入的密码是否符合要求
+	if (getSize(aPwd) >= 8)
+	{
+		printf("输入的密码长度超过最大值！\n");
+		return;
+	}
+
+	// 进行下机
+	nResult = doSettle(aName, aPwd, pInfo);
+
+	// 根据下机结果，提示不同信息
+	printf("\n");
+	printf("--------------*****--------------下机信息如下--------------*****--------------\n");
+	switch (nResult)
+	{
+	case 0: // 下机失败
+	{
+		printf("下机失败！\n");
+		break;
+	}
+	case 1: // 下机成功
+	{
+		// 输出表格表头
+		//printf("卡号\t消费\t余额\t\t上机时间\t\t下机时间\n");
+		printf("%-*s%-*s%-*s%-*s%-*s\n",
+    CARD_NO_WIDTH, "卡号",
+    CONSUME_WIDTH, "消费",
+    BALANCE_WIDTH, "余额",
+    TIME_WIDTH, "上机时间",
+    TIME_WIDTH, "下机时间");
+		// 将上机时间默认为卡的最后使用时间，后面添加计费信息后，使用计费信息时间
+		// 将time_t类型时间转化为字符串，字符串格式为“年-月-日 时：分”
+		timeToString(pInfo->tStart, aStartTime);
+		timeToString(pInfo->tEnd, aEndTime);
+
+		// 输出下机卡信息
+		//printf("%s\t%.2f\t%.2f", pInfo->aCardName, pInfo->fAmount, pInfo->fBalance);
+		//printf("\t%s\t%s\n", aStartTime, aEndTime);
+		printf("%-*s%-*.2f%-*.2f%-*s%-*s\n",
+    CARD_NO_WIDTH, pInfo->aCardName,
+    CONSUME_WIDTH, pInfo->fAmount,
+    BALANCE_WIDTH, pInfo->fBalance,
+    TIME_WIDTH, aStartTime,
+    TIME_WIDTH, aEndTime);
+		printf("---------------------------------------------------------------------------\n");
+		printf("下机成功！\n");
+		break;
+	}
+	case 2: // 正在使用或已注销
+	{
+		printf("该卡未在使用！\n");
+		break;
+	}
+	case 3: // 卡余额不足
+	{
+		printf("卡余额不足！\n");
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+	// 释放动态分配内存
+	free(pInfo);
+}
+
+// 函数名:addMoney
+// 功能:充值
+// 参数:void
+// 返回值:void
+void addMoney()
+{
+	char aName[18] = {0}; // 卡号
+	char aPwd[8] = {0};	  // 密码
+	float fAmount = 0;	  // 充值金额
+	MoneyInfo sMoneyInfo; // 充值卡信息
+
+	printf("请输入充值的卡号（长度1~18）：");
+	scanf("%18s", aName);
+	// 判断输入的卡号是否符合要求
+	if (getSize(aName) >= 18)
+	{
+		printf("输入的卡号长度超过最大值！\n");
+		return;
+	}
+
+	printf("请输入充值密码（长度1~8）：");
+	scanf("%8s", aPwd);
+	// 判断输入的密码是否符合要求
+	if (getSize(aPwd) >= 8)
+	{
+		printf("输入的密码长度超过最大值！\n");
+		return;
+	}
+
+	cout << "请输入充值金额(RMB)：";
+	cin >> fAmount;
+	cin.clear();
+	cin.sync();
+
+	// 保存充值金额
+	sMoneyInfo.fMoney = fAmount;
+	// 判断是否保存成功
+	if (TRUE == doAddMoney(aName, aPwd, &sMoneyInfo))
+	{
+		// 提示充值信息
+		printf("-----***-----充值信息如下-----***-----\n");
+		// 输出表格头
+		//printf("卡号\t充值金额\t余额\n");
+		printf("%-*s%-*s%-*s\n",
+    CARD_NO_WIDTH, "卡号",
+    AMOUNT_WIDTH, "充值金额",
+    BALANCE_WIDTH, "余额");
+		// 输出充值卡信息
+		//printf("%s\t%.2f    \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
+		printf("%-*s%-*.2f%-*.2f\n",
+    CARD_NO_WIDTH, sMoneyInfo.aCardName,
+    AMOUNT_WIDTH, sMoneyInfo.fMoney,
+    BALANCE_WIDTH, sMoneyInfo.fBalance);
+		printf("--------------------------------------\n");
+	}
+	else
+	{
+		printf("-------充值失败！-------\n");
+	}
+}
+
+// 函数名:refundMoney
+// 功能:退费
+// 参数:void
+// 返回值:void
+void refundMoney()
+{
+	char aName[18] = {0}; // 卡号
+	char aPwd[8] = {0};	  // 密码
+	int nResult = -1;	  // 退费结果
+	MoneyInfo sMoneyInfo; // 退费信息
+
+	printf("请输入退费卡号（长度1~18）：");
+	scanf("%18s", aName);
+	// 判断输入的卡号是否符合要求
+	if (getSize(aName) >= 18)
+	{
+		printf("输入的卡号长度超过最大值！\n");
+		return;
+	}
+
+	printf("请输入退费密码（长度1~8）：");
+	scanf("%8s", aPwd);
+	// 判断输入的密码是否符合要求
+	if (getSize(aPwd) >= 8)
+	{
+		printf("输入的密码长度超过最大值！\n");
+		return;
+	}
+
+	// 进行退费
+	nResult = doRefundMoney(aName, aPwd, &sMoneyInfo);
+	// 根据退费结果，提示不同信息
+	switch (nResult)
+	{
+	case 0:
+	{
+		printf("退费失败！\n");
+		break;
+	}
+	case 1:
+	{
+		// 提示退费信息
+		printf("------***----退费信息如下----***------\n");
+		//printf("卡号\t退费金额\t余额\n");
+		printf("%-*s%-*s%-*s\n",
+    CARD_NO_WIDTH, "卡号",
+    AMOUNT_WIDTH, "退费金额",
+    BALANCE_WIDTH, "余额");
+		// 输出充值卡信息
+		//printf("%s\t%.2f   \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
+		printf("%-*s%-*.2f%-*.2f\n",
+    CARD_NO_WIDTH, sMoneyInfo.aCardName,
+    AMOUNT_WIDTH, sMoneyInfo.fMoney,
+    BALANCE_WIDTH, sMoneyInfo.fBalance);
+		printf("--------------------------------------\n");
+		break;
+	}
+	case 2:
+	{
+		printf("------该卡正在使用或已经注销！------\n");
+		break;
+	}
+	case 3:
+	{
+		printf("------卡余额不足！------\n");
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+}
+
+// 函数名:annul
+// 功能:注销卡
+// 参数:void
+// 返回值:void
+void annul()
+{
+	Card card;
+
+	printf("请输入注销卡卡号（长度1~18）：");
+	scanf("%18s", card.aName);
+	printf("请输入密码（长度1~8）：");
+	scanf("%8s", card.aPwd);
+
+	if (FALSE == annulCard(&card))
+	{
+		printf("---------注销卡失败---------\n");
+		return;
+	}
+	else
+	{
+		// 提示注销的信息
+		printf("---***---注销信息如下---***---\n");
+		// 输出表格头
+		//printf("卡号\t退款金额\n");
+		printf("%-*s%-*s\n",
+    CARD_NO_WIDTH, "卡号",
+    AMOUNT_WIDTH, "退款金额");
+		//printf("%s\t%.2f\n", card.aName, card.fBalance);
+		printf("%-*s%-*.2f\n",
+    CARD_NO_WIDTH, card.aName,
+    AMOUNT_WIDTH, card.fBalance);
+		printf("------------------------------\n");
+
+		return;
+	}
+}
+
+// 计算字符串的显示宽度（中文2，英文1）
+// int calcDisplayWidth(const char *str) {
+//     setlocale(LC_ALL, ""); // 启用本地化（支持宽字符）
+//     int width = 0;
+//     while (*str) {
+//         if (*str & 0x80) { // 判断是否为中文字符（GBK编码）
+//             width += 2;
+//             str += 2; // 中文字符占2字节
+//         } else {
+//             width += 1;
+//             str += 1;
+//         }
+//     }
+//     return width;
+// }
+int calcDisplayWidth(const char *str) {
+    int width = 0;
+    while (*str) {
+        unsigned char b = (unsigned char)*str;
+        int char_len = 0;
+        uint32_t codepoint = 0;
+
+        // 解析 UTF-8 字符长度和码点
+        if (b < 0x80) {                // 1字节字符 (ASCII)
+            char_len = 1;
+            codepoint = b;
+        } else if ((b & 0xE0) == 0xC0) { // 2字节字符
+            char_len = 2;
+            if (str[1] == '\0') break;  // 防止越界
+            codepoint = ((b & 0x1F) << 6) | (str[1] & 0x3F);
+        } else if ((b & 0xF0) == 0xE0) { // 3字节字符（中文在此范围）
+            char_len = 3;
+            if (str[1] == '\0' || str[2] == '\0') break;
+            codepoint = ((b & 0x0F) << 12) | ((str[1] & 0x3F) << 6) | (str[2] & 0x3F);
+        } else if ((b & 0xF8) == 0xF0) { // 4字节字符（如扩展汉字、Emoji）
+            char_len = 4;
+            if (str[1] == '\0' || str[2] == '\0' || str[3] == '\0') break;
+            codepoint = ((b & 0x07) << 18) | ((str[1] & 0x3F) << 12) 
+                       | ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
+        } else {                        // 非法字符，跳过1字节
+            char_len = 1;
+            codepoint = 0;
+        }
+
+        // 判断是否为中文字符（Unicode 范围）
+        if (
+            (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||   // 基本汉字
+            (codepoint >= 0x3400 && codepoint <= 0x4DBF) ||   // 扩展A
+            (codepoint >= 0x20000 && codepoint <= 0x2A6DF) || // 扩展B
+            (codepoint >= 0x2A700 && codepoint <= 0x2B73F) || // 扩展C
+            (codepoint >= 0x2B740 && codepoint <= 0x2B81F) || // 扩展D
+            (codepoint >= 0x2B820 && codepoint <= 0x2CEAF) || // 扩展E
+            (codepoint >= 0xF900 && codepoint <= 0xFAFF) ||   // 兼容表意文字
+            (codepoint >= 0x2F800 && codepoint <= 0x2FA1F)    // 兼容补充
+        ) {
+            width += 2; // 中文字符显示宽度为2
+        } else {
+            width += 1; // 其他字符宽度为1
+        }
+
+        str += char_len; // 移动到下一个字符
+    }
+    return width;
+}
+
+
+// 生成左对齐格式字符串（如 "%-20s"）
+void getLeftAlignFormat(char *fmt, int targetWidth, const char *str) {
+    int actualWidth = calcDisplayWidth(str);
+    int padSpaces = targetWidth - actualWidth;
+    if (padSpaces < 0) padSpaces = 0;
+    sprintf(fmt, "%%-%ds", padSpaces + (int)strlen(str));
+}

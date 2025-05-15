@@ -1,0 +1,27 @@
+{
+    // "editor.fontFamily": "'JetBrains Mono', monospace",
+    // "editor.fontLigatures": "'jetb'",  // 启用自定义连字
+    // "editor.fontVariations": "'wdth' 100, 'wght' 400",
+    // "terminal.integrated.fontFamily": "'/home/chaoz/.local/share/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf'",
+    "editor.fontFamily": "'JetBrains Mono', 'Droid Sans Mono', monospace",
+    "editor.fontLigatures": true,
+    "workbench.colorTheme": "One Dark Pro Darker",
+    "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true,
+    "files.autoGuessEncoding": true,
+    "editor.smoothScrolling": true,
+    "editor.cursorSmoothCaretAnimation": "on",
+    "workbench.list.smoothScrolling": true,
+    "terminal.integrated.smoothScrolling": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.tabCompletion": "on",
+    "editor.mouseWheelZoom": true,
+    "files.autoSave": "afterDelay",
+    "editor.scrollbar.verticalScrollbarSize": 0,
+    "editor.scrollbar.horizontalScrollbarSize": 8,
+    "editor.minimap.showSlider": "always",
+    "explorer.confirmDelete": false,
+    "git.enableSmartCommit": true,
+    "editor.fontSize": 18,
+    "C_Cpp.errorSquiggles": "disabled"
+}
