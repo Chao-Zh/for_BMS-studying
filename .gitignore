@@ -1,3 +1,10 @@
-.vscode
-document
-a.exe
+.vscode/
+document/
+logs/
+
+*.class
+*.exe
+*.dll
+*.so
+*.out
+*.log
