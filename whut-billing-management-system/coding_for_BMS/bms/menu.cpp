@@ -66,7 +66,7 @@ void add()
     strncpy(card.aPwd, pwd, sizeof(card.aPwd)-1);
 
     // 输入金额
-    printf("请输入开卡金额(RMB)：");
+    printf("请输入开卡金额(RMB):");
     scanf("%f", &card.fBalance);
 
 	
@@ -158,7 +158,7 @@ void query()
 	printf("请输入要查询的卡号(长度1~18):");
 	scanf("%18s", name);
 
-	printf("1.精确查询||2.模糊查询(输入1或2)：");
+	printf("1.精确查询||2.模糊查询(输入1或2):");
 	scanf("%d", &icha);
 
 	if (icha == 1)
@@ -173,7 +173,7 @@ void query()
 	{
 		do
 		{
-			printf("输入错误！\n请重新输入：");
+			printf("输入错误！\n请重新输入:");
 			scanf("%d", &icha);
 		} while (icha != 1 && icha != 2);
 		if (icha == 1)
@@ -277,7 +277,7 @@ void logon()
 	int nResult = 0;
 
 	// 提示并接受上机卡号
-	printf("请输入上机的卡号（长度为0~18）：");
+	printf("请输入上机的卡号(长度为0~18):");
 	scanf("%30s", aName);
 	// 判断输入的卡号是否符合要求
 	if (getSize(aName) >= 18)
@@ -286,7 +286,7 @@ void logon()
 		return;
 	}
 	// 提示并接受上机密码
-	printf("请输入上机密码（长度为1~8）：");
+	printf("请输入上机密码(长度为1~8):");
 	scanf("%20s", aPwd);
 	// 判断输入的密码是否符合要求
 	if (getSize(aPwd) >= 8)
@@ -321,9 +321,9 @@ void logon()
 		timeToString(pInfo->tLogon, aLastTime); // 结构指针当数组名使用
 		// 输出上机卡信息
 		printf("%-*s%-*.2f%-*s\n",
-    CARD_NO_WIDTH, pInfo->aCardName,
-    BALANCE_WIDTH, pInfo->fBalance,
-    TIME_WIDTH, aLastTime);
+    	CARD_NO_WIDTH, pInfo->aCardName,
+    	BALANCE_WIDTH, pInfo->fBalance,
+    	TIME_WIDTH, aLastTime);
 		//printf("%s\t%.2f\t%s\n", pInfo->aCardName, pInfo->fBalance, aLastTime);
 		
 		printf("------------------------------------------\n");
@@ -359,7 +359,7 @@ void settle()
 	{
 		exit(1);
 	}
-	printf("请输入下机卡号（长度1~18）：");
+	printf("请输入下机卡号(长度1~180:");
 	scanf("%18s", aName);
 	// 判断输入的卡号是否符合要求
 	if (getSize(aName) >= 18)
@@ -368,7 +368,7 @@ void settle()
 		return;
 	}
 
-	printf("请输入下机密码（长度1~8）:");
+	printf("请输入下机密码(长度1~8):");
 	scanf("%8s", aPwd);
 	// 判断输入的密码是否符合要求
 	if (getSize(aPwd) >= 8)
@@ -395,11 +395,11 @@ void settle()
 		// 输出表格表头
 		//printf("卡号\t消费\t余额\t\t上机时间\t\t下机时间\n");
 		printf("%-*s%-*s%-*s%-*s%-*s\n",
-    CARD_NO_WIDTH, "卡号",
-    CONSUME_WIDTH, "消费",
-    BALANCE_WIDTH, "余额",
-    TIME_WIDTH, "上机时间",
-    TIME_WIDTH, "下机时间");
+    	CARD_NO_WIDTH, "卡号",
+    	CONSUME_WIDTH, "消费",
+    	BALANCE_WIDTH, "余额",
+    	TIME_WIDTH, "上机时间",
+    	TIME_WIDTH, "下机时间");
 		// 将上机时间默认为卡的最后使用时间，后面添加计费信息后，使用计费信息时间
 		// 将time_t类型时间转化为字符串，字符串格式为“年-月-日 时：分”
 		timeToString(pInfo->tStart, aStartTime);
@@ -409,11 +409,11 @@ void settle()
 		//printf("%s\t%.2f\t%.2f", pInfo->aCardName, pInfo->fAmount, pInfo->fBalance);
 		//printf("\t%s\t%s\n", aStartTime, aEndTime);
 		printf("%-*s%-*.2f%-*.2f%-*s%-*s\n",
-    CARD_NO_WIDTH, pInfo->aCardName,
-    CONSUME_WIDTH, pInfo->fAmount,
-    BALANCE_WIDTH, pInfo->fBalance,
-    TIME_WIDTH, aStartTime,
-    TIME_WIDTH, aEndTime);
+    	CARD_NO_WIDTH, pInfo->aCardName,
+    	CONSUME_WIDTH, pInfo->fAmount,
+    	BALANCE_WIDTH, pInfo->fBalance,
+    	TIME_WIDTH, aStartTime,
+    	TIME_WIDTH, aEndTime);
 		printf("---------------------------------------------------------------------------\n");
 		printf("下机成功！\n");
 		break;
@@ -448,7 +448,7 @@ void addMoney()
 	float fAmount = 0;	  // 充值金额
 	MoneyInfo sMoneyInfo; // 充值卡信息
 
-	printf("请输入充值的卡号（长度1~18）：");
+	printf("请输入充值的卡号(长度1~18):");
 	scanf("%18s", aName);
 	// 判断输入的卡号是否符合要求
 	if (getSize(aName) >= 18)
@@ -457,7 +457,7 @@ void addMoney()
 		return;
 	}
 
-	printf("请输入充值密码（长度1~8）：");
+	printf("请输入充值密码(长度1~80:");
 	scanf("%8s", aPwd);
 	// 判断输入的密码是否符合要求
 	if (getSize(aPwd) >= 8)
@@ -466,7 +466,7 @@ void addMoney()
 		return;
 	}
 
-	cout << "请输入充值金额(RMB)：";
+	cout << "请输入充值金额(RMB):";
 	cin >> fAmount;
 	cin.clear();
 	cin.sync();
@@ -481,15 +481,15 @@ void addMoney()
 		// 输出表格头
 		//printf("卡号\t充值金额\t余额\n");
 		printf("%-*s%-*s%-*s\n",
-    CARD_NO_WIDTH, "卡号",
-    AMOUNT_WIDTH, "充值金额",
-    BALANCE_WIDTH, "余额");
+    	CARD_NO_WIDTH, "卡号",
+    	AMOUNT_WIDTH, "充值金额",
+    	BALANCE_WIDTH, "余额");
 		// 输出充值卡信息
 		//printf("%s\t%.2f    \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
 		printf("%-*s%-*.2f%-*.2f\n",
-    CARD_NO_WIDTH, sMoneyInfo.aCardName,
-    AMOUNT_WIDTH, sMoneyInfo.fMoney,
-    BALANCE_WIDTH, sMoneyInfo.fBalance);
+    	CARD_NO_WIDTH, sMoneyInfo.aCardName,
+    	AMOUNT_WIDTH, sMoneyInfo.fMoney,
+    	BALANCE_WIDTH, sMoneyInfo.fBalance);
 		printf("--------------------------------------\n");
 	}
 	else
@@ -509,7 +509,7 @@ void refundMoney()
 	int nResult = -1;	  // 退费结果
 	MoneyInfo sMoneyInfo; // 退费信息
 
-	printf("请输入退费卡号（长度1~18）：");
+	printf("请输入退费卡号(长度1~18):");
 	scanf("%18s", aName);
 	// 判断输入的卡号是否符合要求
 	if (getSize(aName) >= 18)
@@ -518,7 +518,7 @@ void refundMoney()
 		return;
 	}
 
-	printf("请输入退费密码（长度1~8）：");
+	printf("请输入退费密码(长度1~8):");
 	scanf("%8s", aPwd);
 	// 判断输入的密码是否符合要求
 	if (getSize(aPwd) >= 8)
@@ -543,15 +543,15 @@ void refundMoney()
 		printf("------***----退费信息如下----***------\n");
 		//printf("卡号\t退费金额\t余额\n");
 		printf("%-*s%-*s%-*s\n",
-    CARD_NO_WIDTH, "卡号",
-    AMOUNT_WIDTH, "退费金额",
-    BALANCE_WIDTH, "余额");
+    	CARD_NO_WIDTH, "卡号",
+    	AMOUNT_WIDTH, "退费金额",
+    	BALANCE_WIDTH, "余额");
 		// 输出充值卡信息
 		//printf("%s\t%.2f   \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
 		printf("%-*s%-*.2f%-*.2f\n",
-    CARD_NO_WIDTH, sMoneyInfo.aCardName,
-    AMOUNT_WIDTH, sMoneyInfo.fMoney,
-    BALANCE_WIDTH, sMoneyInfo.fBalance);
+    	CARD_NO_WIDTH, sMoneyInfo.aCardName,
+    	AMOUNT_WIDTH, sMoneyInfo.fMoney,
+    	BALANCE_WIDTH, sMoneyInfo.fBalance);
 		printf("--------------------------------------\n");
 		break;
 	}
@@ -580,9 +580,9 @@ void annul()
 {
 	Card card;
 
-	printf("请输入注销卡卡号（长度1~18）：");
+	printf("请输入注销卡卡号(长度1~18):");
 	scanf("%18s", card.aName);
-	printf("请输入密码（长度1~8）：");
+	printf("请输入密码(长度1~8):");
 	scanf("%8s", card.aPwd);
 
 	if (FALSE == annulCard(&card))
@@ -597,12 +597,12 @@ void annul()
 		// 输出表格头
 		//printf("卡号\t退款金额\n");
 		printf("%-*s%-*s\n",
-    CARD_NO_WIDTH, "卡号",
-    AMOUNT_WIDTH, "退款金额");
+    	CARD_NO_WIDTH, "卡号",
+    	AMOUNT_WIDTH, "退款金额");
 		//printf("%s\t%.2f\n", card.aName, card.fBalance);
 		printf("%-*s%-*.2f\n",
-    CARD_NO_WIDTH, card.aName,
-    AMOUNT_WIDTH, card.fBalance);
+    	CARD_NO_WIDTH, card.aName,
+    	AMOUNT_WIDTH, card.fBalance);
 		printf("------------------------------\n");
 
 		return;
