@@ -10,5 +10,5 @@ void settle();                    // 输入下机卡信息，查询到输出上�
 void addMoney();                  // 充值
 void refundMoney();               // 退费
 void annul();                     // 注销卡
-int calcDisplayWidth();           // 计算字符串的显示宽度（中文2，英文1）
-void getLeftAlignFormat();        // 生成左对齐格式字符串（如 "%-20s")
+int calcDisplayWidth(const char *str);           // 计算字符串的显示宽度（中文2，英文1）
+void getLeftAlignFormat(char *fmt, int targetWidth, const char *str);        // 生成左对齐格式字符串（如 "%-20s")

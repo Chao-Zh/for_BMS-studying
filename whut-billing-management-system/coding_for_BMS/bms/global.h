@@ -13,11 +13,11 @@
 #define MONEYPATH "data/money.ams"     // 充值退费信息保存路径
 
 // 列宽常量
-#define CARD_NO_WIDTH      18  // 卡号（支持1-18长度）
+#define CARD_NO_WIDTH      20  // 卡号（支持1-18长度）
 #define PWD_WIDTH          20  // 密码
 #define STATUS_WIDTH       8  // 状态
-#define INIT_BALANCE_WIDTH 12  // 开卡金额（如：10000.00）
-#define BALANCE_WIDTH      12  // 余额
+#define INIT_BALANCE_WIDTH 16  // 开卡金额（如：10000.00）
+#define BALANCE_WIDTH      16  // 余额
 #define AMOUNT_WIDTH       16  // 充值/退费
 #define TIME_WIDTH         20  // 时间（格式：YYYY-MM-DD HH:MM）
 #define CONSUME_WIDTH      16  // 消费金额

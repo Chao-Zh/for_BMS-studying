@@ -16,6 +16,9 @@
 
 using namespace std;
 
+char fmt[64];//储存生成的格式字符串
+
+
 // 函数名:outputMenu
 // 功能:输出系统菜单
 // 参数:void
@@ -105,11 +108,20 @@ if (!localtime_r(&card.tEnd, &tm_check)) {
     // 输出信息
     printf("----------------添加的卡信息如下----------------\n");
     //printf("卡号\t密码\t状态\t开卡金额\n");
-	printf("%-*s%-*s%-*s%-*s\n", 
-    CARD_NO_WIDTH, "卡号", 
-    PWD_WIDTH, "密码", 
-    STATUS_WIDTH, "状态", 
-    INIT_BALANCE_WIDTH, "开卡金额");
+	// printf("%-*s%-*s%-*s%-*s\n", 
+    // CARD_NO_WIDTH, "卡号", 
+    // PWD_WIDTH, "密码", 
+    // STATUS_WIDTH, "状态", 
+    // INIT_BALANCE_WIDTH, "开卡金额");
+	getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+	printf(fmt, "卡号"); 
+	getLeftAlignFormat(fmt, PWD_WIDTH, "密码");
+	printf(fmt, "密码");
+	getLeftAlignFormat(fmt, STATUS_WIDTH, "状态");
+	printf(fmt, "状态");
+	getLeftAlignFormat(fmt, INIT_BALANCE_WIDTH, "开卡金额");
+	printf(fmt, "开卡金额");
+	printf("\n");
     //printf("%s\t%s\t%d\t%.2f\n", card.aName, card.aPwd, card.nStatus, card.fBalance);
 	printf("%-*s%-*s%-*d%-*.2f\n",
     CARD_NO_WIDTH, card.aName,
@@ -197,13 +209,26 @@ void query()
 			printf("-------------******-------------查询到的卡信息如下-------------******-------------\n");
 			// 输出表格的表头
 			//printf("卡号\t状态\t余额\t累计金额\t使用次数\t上次使用时间\n");
-			printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
-    		CARD_NO_WIDTH, "卡号", 
-    		STATUS_WIDTH, "状态", 
-    		BALANCE_WIDTH, "余额", 
-    		COL_TOTAL_USE, "累计金额", 
-    		COL_USE_COUNT, "使用次数", 
-    		TIME_WIDTH, "上次使用时间");
+			// printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
+    		// CARD_NO_WIDTH, "卡号", 
+    		// STATUS_WIDTH, "状态", 
+    		// BALANCE_WIDTH, "余额", 
+    		// COL_TOTAL_USE, "累计金额", 
+    		// COL_USE_COUNT, "使用次数", 
+    		// TIME_WIDTH, "上次使用时间");
+			getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+			printf(fmt, "卡号"); 
+			getLeftAlignFormat(fmt, STATUS_WIDTH, "状态");
+			printf(fmt, "状态");
+			getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+			printf(fmt, "余额");
+			getLeftAlignFormat(fmt, COL_TOTAL_USE, "累计金额");
+			printf(fmt, "累计金额");
+			getLeftAlignFormat(fmt, COL_USE_COUNT, "使用次数");
+			printf(fmt, "使用次数");
+			getLeftAlignFormat(fmt, TIME_WIDTH, "上次使用时间");
+			printf(fmt, "上次使用时间");
+			printf("\n");
 
 			// 将time_t类型时间转换为字符串，字符串格式为“年-月-日 时：分”
 			timeToString(pCard->tLastTime, aLastTime);
@@ -223,13 +248,26 @@ void query()
 			printf("-------------******-------------查询到的卡信息如下-------------******-------------\n");
 			// 输出表格的表头
 			//printf("卡号\t状态\t余额\t累计金额\t使用次数\t上次使用时间\n");
-			printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
-    		CARD_NO_WIDTH, "卡号", 
-    		STATUS_WIDTH, "状态", 
-    		BALANCE_WIDTH, "余额", 
-    		COL_TOTAL_USE, "累计金额", 
-    		COL_USE_COUNT, "使用次数", 
-    		TIME_WIDTH, "上次使用时间");
+			// printf("%-*s%-*s%-*s%-*s%-*s%-*s\n", 
+    		// CARD_NO_WIDTH, "卡号", 
+    		// STATUS_WIDTH, "状态", 
+    		// BALANCE_WIDTH, "余额", 
+    		// COL_TOTAL_USE, "累计金额", 
+    		// COL_USE_COUNT, "使用次数", 
+    		// TIME_WIDTH, "上次使用时间");
+			getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+			printf(fmt, "卡号"); 
+			getLeftAlignFormat(fmt, STATUS_WIDTH, "状态");
+			printf(fmt, "状态");
+			getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+			printf(fmt, "余额");
+			getLeftAlignFormat(fmt, COL_TOTAL_USE, "累计金额");
+			printf(fmt, "累计金额");
+			getLeftAlignFormat(fmt, COL_USE_COUNT, "使用次数");
+			printf(fmt, "使用次数");
+			getLeftAlignFormat(fmt, TIME_WIDTH, "上次使用时间");
+			printf(fmt, "上次使用时间");
+			printf("\n");
 
 			for (i = 0; i < nIndex; i++)
 			{
@@ -312,10 +350,17 @@ void logon()
 		printf("------***------上机信息如下------***------\n");
 		// 输出表格的表头
 		//printf("卡号\t余额\t上机时间\n");
-		printf("%-*s%-*s%-*s\n",
-    	CARD_NO_WIDTH, "卡号",
-    	BALANCE_WIDTH, "余额",
-    	TIME_WIDTH, "上机时间");
+		// printf("%-*s%-*s%-*s\n",
+    	// CARD_NO_WIDTH, "卡号",
+    	// BALANCE_WIDTH, "余额",
+    	// TIME_WIDTH, "上机时间");
+		getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+		printf(fmt, "卡号"); 
+		getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+		printf(fmt, "余额");
+		getLeftAlignFormat(fmt, TIME_WIDTH, "上机时间");
+		printf(fmt, "上机时间");
+		printf("\n");
 
 		// 将time_t类型时间转化为字符串，字符串格式为“年-月-日 时：分”
 		timeToString(pInfo->tLogon, aLastTime); // 结构指针当数组名使用
@@ -394,12 +439,23 @@ void settle()
 	{
 		// 输出表格表头
 		//printf("卡号\t消费\t余额\t\t上机时间\t\t下机时间\n");
-		printf("%-*s%-*s%-*s%-*s%-*s\n",
-    	CARD_NO_WIDTH, "卡号",
-    	CONSUME_WIDTH, "消费",
-    	BALANCE_WIDTH, "余额",
-    	TIME_WIDTH, "上机时间",
-    	TIME_WIDTH, "下机时间");
+		// printf("%-*s%-*s%-*s%-*s%-*s\n",
+    	// CARD_NO_WIDTH, "卡号",
+    	// CONSUME_WIDTH, "消费",
+    	// BALANCE_WIDTH, "余额",
+    	// TIME_WIDTH, "上机时间",
+    	// TIME_WIDTH, "下机时间");
+		getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+		printf(fmt, "卡号"); 
+		getLeftAlignFormat(fmt, CONSUME_WIDTH, "消费");
+		printf(fmt, "消费");
+		getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+		printf(fmt, "余额");
+		getLeftAlignFormat(fmt, TIME_WIDTH, "上机时间");
+		printf(fmt, "上机时间");
+		getLeftAlignFormat(fmt, TIME_WIDTH, "下机时间");
+		printf(fmt, "下机时间");
+		printf("\n");
 		// 将上机时间默认为卡的最后使用时间，后面添加计费信息后，使用计费信息时间
 		// 将time_t类型时间转化为字符串，字符串格式为“年-月-日 时：分”
 		timeToString(pInfo->tStart, aStartTime);
@@ -480,12 +536,19 @@ void addMoney()
 		printf("-----***-----充值信息如下-----***-----\n");
 		// 输出表格头
 		//printf("卡号\t充值金额\t余额\n");
-		printf("%-*s%-*s%-*s\n",
-    	CARD_NO_WIDTH, "卡号",
-    	AMOUNT_WIDTH, "充值金额",
-    	BALANCE_WIDTH, "余额");
+		// printf("%-*s%-*s%-*s\n",
+    	// CARD_NO_WIDTH, "卡号",
+    	// AMOUNT_WIDTH, "充值金额",
+    	// BALANCE_WIDTH, "余额");
+		getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+		printf(fmt, "卡号"); 
+		getLeftAlignFormat(fmt, AMOUNT_WIDTH, "充值金额");
+		printf(fmt, "充值金额");
+		getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+		printf(fmt, "余额");
+		printf("\n");
 		// 输出充值卡信息
-		//printf("%s\t%.2f    \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
+		//printf("%s\t%.2f\t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
 		printf("%-*s%-*.2f%-*.2f\n",
     	CARD_NO_WIDTH, sMoneyInfo.aCardName,
     	AMOUNT_WIDTH, sMoneyInfo.fMoney,
@@ -542,10 +605,17 @@ void refundMoney()
 		// 提示退费信息
 		printf("------***----退费信息如下----***------\n");
 		//printf("卡号\t退费金额\t余额\n");
-		printf("%-*s%-*s%-*s\n",
-    	CARD_NO_WIDTH, "卡号",
-    	AMOUNT_WIDTH, "退费金额",
-    	BALANCE_WIDTH, "余额");
+		// printf("%-*s%-*s%-*s\n",
+    	// CARD_NO_WIDTH, "卡号",
+    	// AMOUNT_WIDTH, "退费金额",
+    	// BALANCE_WIDTH, "余额");
+		getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+		printf(fmt, "卡号"); 
+		getLeftAlignFormat(fmt, AMOUNT_WIDTH, "退费金额");
+		printf(fmt, "退费金额");
+		getLeftAlignFormat(fmt, BALANCE_WIDTH, "余额");
+		printf(fmt, "余额");
+		printf("\n");
 		// 输出充值卡信息
 		//printf("%s\t%.2f   \t%.2f\n", sMoneyInfo.aCardName, sMoneyInfo.fMoney, sMoneyInfo.fBalance);
 		printf("%-*s%-*.2f%-*.2f\n",
@@ -596,9 +666,14 @@ void annul()
 		printf("---***---注销信息如下---***---\n");
 		// 输出表格头
 		//printf("卡号\t退款金额\n");
-		printf("%-*s%-*s\n",
-    	CARD_NO_WIDTH, "卡号",
-    	AMOUNT_WIDTH, "退款金额");
+		// printf("%-*s%-*s\n",
+    	// CARD_NO_WIDTH, "卡号",
+    	// AMOUNT_WIDTH, "退款金额");
+		getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
+		printf(fmt, "卡号"); 
+		getLeftAlignFormat(fmt, AMOUNT_WIDTH, "退款金额");
+		printf(fmt, "退款金额");
+		printf("\n");
 		//printf("%s\t%.2f\n", card.aName, card.fBalance);
 		printf("%-*s%-*.2f\n",
     	CARD_NO_WIDTH, card.aName,
@@ -609,21 +684,8 @@ void annul()
 	}
 }
 
-// 计算字符串的显示宽度（中文2，英文1）
-// int calcDisplayWidth(const char *str) {
-//     setlocale(LC_ALL, ""); // 启用本地化（支持宽字符）
-//     int width = 0;
-//     while (*str) {
-//         if (*str & 0x80) { // 判断是否为中文字符（GBK编码）
-//             width += 2;
-//             str += 2; // 中文字符占2字节
-//         } else {
-//             width += 1;
-//             str += 1;
-//         }
-//     }
-//     return width;
-// }
+
+
 int calcDisplayWidth(const char *str) {
     int width = 0;
     while (*str) {
@@ -631,24 +693,24 @@ int calcDisplayWidth(const char *str) {
         int char_len = 0;
         uint32_t codepoint = 0;
 
-        // 解析 UTF-8 字符长度和码点
-        if (b < 0x80) {                // 1字节字符 (ASCII)
+        // 解析 UTF-8 字符
+        if (b < 0x80) { // 1字节字符
             char_len = 1;
             codepoint = b;
         } else if ((b & 0xE0) == 0xC0) { // 2字节字符
             char_len = 2;
-            if (str[1] == '\0') break;  // 防止越界
+            if (str[1] == '\0') break;
             codepoint = ((b & 0x1F) << 6) | (str[1] & 0x3F);
-        } else if ((b & 0xF0) == 0xE0) { // 3字节字符（中文在此范围）
+        } else if ((b & 0xF0) == 0xE0) { // 3字节字符（中文）
             char_len = 3;
             if (str[1] == '\0' || str[2] == '\0') break;
             codepoint = ((b & 0x0F) << 12) | ((str[1] & 0x3F) << 6) | (str[2] & 0x3F);
-        } else if ((b & 0xF8) == 0xF0) { // 4字节字符（如扩展汉字、Emoji）
+        } else if ((b & 0xF8) == 0xF0) { // 4字节字符
             char_len = 4;
             if (str[1] == '\0' || str[2] == '\0' || str[3] == '\0') break;
             codepoint = ((b & 0x07) << 18) | ((str[1] & 0x3F) << 12) 
                        | ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
-        } else {                        // 非法字符，跳过1字节
+        } else { // 非法字符
             char_len = 1;
             codepoint = 0;
         }
@@ -664,7 +726,7 @@ int calcDisplayWidth(const char *str) {
             (codepoint >= 0xF900 && codepoint <= 0xFAFF) ||   // 兼容表意文字
             (codepoint >= 0x2F800 && codepoint <= 0x2FA1F)    // 兼容补充
         ) {
-            width += 2; // 中文字符显示宽度为2
+            width += 2; // 中文字符宽度为2
         } else {
             width += 1; // 其他字符宽度为1
         }
@@ -675,10 +737,15 @@ int calcDisplayWidth(const char *str) {
 }
 
 
+// 此函数调用可以转换utf-8编码下中文与英文显示列宽不同问题
+//调用格式为（fmt缓存区，#目标长度，“所输入内容”）
 // 生成左对齐格式字符串（如 "%-20s"）
 void getLeftAlignFormat(char *fmt, int targetWidth, const char *str) {
     int actualWidth = calcDisplayWidth(str);
     int padSpaces = targetWidth - actualWidth;
     if (padSpaces < 0) padSpaces = 0;
-    sprintf(fmt, "%%-%ds", padSpaces + (int)strlen(str));
+
+    // 生成格式字符串（如 "%-12s"）
+    sprintf(fmt, "%%-%ds", (int)strlen(str) + padSpaces);
 }
+
