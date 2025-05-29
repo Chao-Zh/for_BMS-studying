@@ -23,6 +23,7 @@ typedef struct CardNote
 } CardNode, *lpCardNode;
 
 // 消费信息结构体
+#pragma pack(push, 1) // 1字节对齐
 typedef struct Billing
 {
 	char aCardName[18]; // 卡号
@@ -32,6 +33,7 @@ typedef struct Billing
 	int nStatus;		// 消费状态0-未结算；1-已经结算
 	int nDel;			// 删除标识，0-未删除，1-已删除
 } Billing;
+#pragma pack(pop)
 
 // 上机信息结构体
 typedef struct LogonIofo

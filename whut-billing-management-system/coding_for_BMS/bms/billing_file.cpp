@@ -77,20 +77,22 @@ int getBillingCount(const char *pPath)
 	if (!ifile.is_open())
 	{ // 遍历文件
 		printf("文件无法正确打开！不能读取计费信息!\n");
-		ifile.close();
+		free(pBilling);  //在返回前释放内存
 		return FALSE;
 	}
 	else
 	{
-		while (!ifile.eof())
-		{
-			if (!ifile.read((char *)pBilling, sizeof(Billing)))
-				;
-			else
-			{
-				nCount++;
-			}
-		}
+		// while (!ifile.eof())
+		// {
+		// 	if (!ifile.read((char *)pBilling, sizeof(Billing)));
+		// 	else
+		// 	{
+		// 		nCount++;
+		// 	}
+		// }
+		while (ifile.read((char *)pBilling, sizeof(Billing))) {
+    	nCount++;
+	}
 		// 关闭文件
 		ifile.close();
 		free(pBilling);
