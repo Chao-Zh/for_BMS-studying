@@ -82,14 +82,6 @@ int getBillingCount(const char *pPath)
 	}
 	else
 	{
-		// while (!ifile.eof())
-		// {
-		// 	if (!ifile.read((char *)pBilling, sizeof(Billing)));
-		// 	else
-		// 	{
-		// 		nCount++;
-		// 	}
-		// }
 		while (ifile.read((char *)pBilling, sizeof(Billing))) {
     	nCount++;
 	}

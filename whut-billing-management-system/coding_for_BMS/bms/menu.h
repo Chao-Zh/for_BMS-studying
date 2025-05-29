@@ -12,3 +12,4 @@ void refundMoney();               // 退费
 void annul();                     // 注销卡
 int calcDisplayWidth(const char *str);           // 计算字符串的显示宽度（中文2，英文1）
 void getLeftAlignFormat(char *fmt, int targetWidth, const char *str);        // 生成左对齐格式字符串（如 "%-20s")
+void cardCount();

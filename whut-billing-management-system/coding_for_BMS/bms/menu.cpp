@@ -400,7 +400,7 @@ void settle()
 	{
 		exit(1);
 	}
-	printf("请输入下机卡号(长度1~180:");
+	printf("请输入下机卡号(长度1~18):");
 	scanf("%18s", aName);
 	// 判断输入的卡号是否符合要求
 	if (getSize(aName) >= 18)
@@ -486,8 +486,8 @@ void settle()
 // 返回值:void
 void addMoney()
 {
-	char aName[18] = {0}; // 卡号
-	char aPwd[8] = {0};	  // 密码
+	char aName[30] = {0}; // 卡号
+	char aPwd[20] = {0};	  // 密码
 	float fAmount = 0;	  // 充值金额
 	MoneyInfo sMoneyInfo; // 充值卡信息
 
@@ -720,3 +720,60 @@ void getLeftAlignFormat(char *fmt, int targetWidth, const char *str) {
     sprintf(fmt, "%%-%ds", (int)strlen(str) + padSpaces);
 }
 
+
+// 函数名cardCount
+// 功能：统计总共有多少卡，有多少可用卡，把所有的卡号信息与状态信息输出
+// 参数：void
+// 返回值：void
+void cardCount() {
+    int total = 0;
+    int available = 0;
+    int index = 0; // 用于接收queryCards返回的实际卡数量
+
+    // 调用queryCards获取所有卡（pName传空字符串匹配所有卡）
+    Card *pCards = queryCards("", &index); 
+
+    if (pCards == NULL || index == 0) {
+        printf("--- 没有找到任何卡信息 ---\n");
+        return;
+    }
+
+    printf("\n------ 卡状态统计 ------\n");
+
+    // 遍历所有卡
+    for (int i = 0; i < index; i++) {
+        total++;
+
+        // 状态字段为nStatus，0,1表示可用.3,4为不可用
+        if (pCards[i].nStatus == 0) { 
+            available++;
+        }
+		if (pCards[i].nStatus == 1) { 
+            available++;
+        }
+
+        // 输出卡信息（卡号字段为aName）
+        printf("卡号：%-20s 状态：", pCards[i].aName);
+        switch(pCards[i].nStatus) {
+            case 0: 
+                printf("可用,未上机\n");
+                break;
+            case 1: 
+                printf("可用,正在上机\n");
+                break;
+            case 2: 
+                printf("已注销\n");
+                break;
+			case 3: 
+                printf("失效\n");
+                break;
+            default:
+                printf("未知状态(%d)\n", pCards[i].nStatus);
+        }
+    }
+
+    printf("\n总计:%d 张卡\n可用卡:%d 张\n", total, available);
+
+    // 释放queryCards分配的内存
+    free(pCards);
+}

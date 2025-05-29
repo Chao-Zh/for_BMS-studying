@@ -291,11 +291,18 @@ int doAddMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 		printf("无该卡信息，不能充值！\n");
 		return FALSE;
 	}
-	// 判断该卡是否未使用或正在上机，只有未使用和正在上机的卡才能进行充值操作
-	if (pCard->nStatus != 0 && pCard->nStatus != 1)
+	// 判断卡在上机阻止充值，防止内存开辟错误
+	if (pCard->nStatus == 1)
+	{
+		printf("该卡正在上机，请下机后充值！ \n");
+		return FALSE;
+	}
+	// 判断该卡是否未使用或正在上机，只有未使用才能进行充值操作
+	else if (pCard->nStatus != 0 || pCard->nStatus != 1)
 	{
 		return FALSE;
 	}
+	
 	// 如果可以充值，更新卡信息
 	pCard->fBalance += pMoneyInfo->fMoney;
 	pCard->fTotalUse += pMoneyInfo->fMoney;

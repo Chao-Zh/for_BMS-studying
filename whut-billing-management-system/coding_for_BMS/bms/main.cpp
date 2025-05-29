@@ -65,7 +65,7 @@ int main()
 			break;
 		case 7:
 			printf("\t*查询统计*\n\n");
-			
+			cardCount();
 			break;
 		case 8:
 			printf("\t*注销卡*\n\n");
