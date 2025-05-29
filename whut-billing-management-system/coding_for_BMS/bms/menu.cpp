@@ -53,6 +53,15 @@ void add()
     // 输入卡号
     printf("请输入卡号(长度1~18):");
     scanf("%18s", name);
+
+	// 中文检测逻辑
+    for (int i = 0; name[i] != '\0'; i++) {
+        // 检测最高位是否为1（ASCII字符最高位为0）
+        if ((unsigned char)name[i] >= 0x80) {
+            printf("卡号中不能包含中文字符以及非法字符！\n");
+            return;
+        }
+    }
     if (strlen(name) >= 18) {
         printf("卡号过长！\n");
         return;
@@ -67,6 +76,17 @@ void add()
     printf("请输入密码(长度1~8):");
     scanf("%8s", pwd);
     strncpy(card.aPwd, pwd, sizeof(card.aPwd)-1);
+
+	// 中文检测逻辑
+    for (int i = 0; pwd[i] != '\0'; i++) {
+        // 检测最高位是否为1（ASCII字符最高位为0）
+        if ((unsigned char)pwd[i] >= 0x80) {
+            printf("密码不能包含中文字符以及非法字符！\n");
+            return;
+        }
+    }
+
+	strncpy(card.aPwd, pwd, sizeof(card.aPwd)-1);
 
     // 输入金额
     printf("请输入开卡金额(RMB):");
@@ -200,6 +220,11 @@ void query()
 	{
 		if (icha == 1)
 		{
+		if (pCard->nStatus == 2) {  // 注意这里用指针运算符->
+                printf("该卡已经注销！\n");
+                return;  // 直接返回不显示详细信息
+			}
+		
 			printf("-------------******-------------查询到的卡信息如下-------------******-------------\n");
 			// 输出表格的表头
 			getLeftAlignFormat(fmt, CARD_NO_WIDTH, "卡号");
