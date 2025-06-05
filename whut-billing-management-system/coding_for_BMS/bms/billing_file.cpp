@@ -4,6 +4,7 @@
 
 #include "model.h"
 #include "global.h"
+#include "billing_file.h"
 
 using namespace std;
 
