@@ -7,4 +7,3 @@ void initBillingList();                                // 初始化计费信息�
 void releaseBillingList();                             // 释放计费信息链表
 int getBilling();                                      // 从计费文件中，获取计费信息保存到链表中
 Billing *queryBilling(const char *pName, int *pIndex); // 在计费信息链表中，查询对应卡的计费信息，并获取其在链表中的索引号
-void initBillingList();

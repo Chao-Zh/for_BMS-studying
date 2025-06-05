@@ -298,15 +298,11 @@ int doAddMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 		return FALSE;
 	}
 	// 判断该卡是否未使用或正在上机，只有未使用才能进行充值操作
-	else if (pCard->nStatus != 0 || pCard->nStatus != 1)
+	else if (pCard->nStatus != 2 || pCard->nStatus != 3)
 	{
-		return FALSE;
-	}
-	
 	// 如果可以充值，更新卡信息
 	pCard->fBalance += pMoneyInfo->fMoney;
 	pCard->fTotalUse += pMoneyInfo->fMoney;
-
 	// 更新文件中的卡信息文件
 	if (FALSE == updateCard(pCard, CARDPATH, nIndex))
 	{
@@ -318,7 +314,7 @@ int doAddMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 	sMoney.nStatus = 0;
 	sMoney.fMoney = pMoneyInfo->fMoney;
 	sMoney.nDel = 0;
-
+	}
 	// 将充值记录保存到文件中
 	if (TRUE == saveMoney(&sMoney, MONEYPATH))
 	{

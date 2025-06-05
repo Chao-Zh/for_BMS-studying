@@ -500,7 +500,7 @@ void addMoney()
 		return;
 	}
 
-	printf("请输入充值密码(长度1~80:");
+	printf("请输入充值密码(长度1~8):");
 	scanf("%8s", aPwd);
 	// 判断输入的密码是否符合要求
 	if (getSize(aPwd) >= 8)

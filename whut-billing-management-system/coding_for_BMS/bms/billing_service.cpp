@@ -33,16 +33,19 @@ int addBilling(const char *pName, Billing *pBilling)
 // 功能:初始化计费信息链表
 // 参数:void
 // 返回值:void
-void initBillingList() {
-    if (billingList == NULL) {
-        billingList = (lpBillingNode)malloc(sizeof(BillingNode));
-        if (billingList) {
-            billingList->next = NULL;
-        } else {
-            // 处理严重错误
-            exit(EXIT_FAILURE);
-        }
-    }
+void initBillingList()
+{
+	lpBillingNode head = NULL;
+	if (billingList == NULL)
+	{
+		head = (lpBillingNode)malloc(sizeof(BillingNode));
+		if (head == NULL)
+		{
+			exit(1);
+		}
+		head->next = NULL;
+		billingList = head;
+	}
 }
 
 // 函数名:releaseBillingList
@@ -75,61 +78,59 @@ int getBilling()
 	int i = 0; // 循环变量
 	lpBillingNode cur = NULL;
 
-	if (billingList == NULL) 
-	{
-        initBillingList();
-    }
 	// 如果初始链表不为空，释放链表
+	if (billingList != NULL)
+	{
 		releaseBillingList();
-	// 初始化链表(重建头节点)
+	}
+	// 初始化链表
 	initBillingList();
 
 	// 获取计费信息数量
 	nCount = getBillingCount(BILLINGPATH);
-	 if (nCount <= 0) {
-        return TRUE;
-    }
 	// 动态分配内存
-	pBilling = (Billing*)malloc(nCount * sizeof(Billing));
-	if (!pBilling) {
-        printf("内存分配失败\n");
-        return FALSE;
-    }
-	if (!readBilling(pBilling, BILLINGPATH)) {
-        free(pBilling);
-        return FALSE;
-    }
-	node = billingList; // 指向头节点
-	if (node == NULL) {
-        free(pBilling);
-        return FALSE;
-    }
-	// 寻找链表末尾
-    while (node->next != NULL) {
-        node = node->next;
-    }
+	pBilling = (Billing *)malloc(sizeof(Billing) * nCount);
+	if (pBilling == 0)
+	{
+		exit(1);
+	}
+	if (pBilling != NULL)
+	{
+		// 获取计费信息
+		if (FALSE == readBilling(pBilling, BILLINGPATH))
+		{
+			free(pBilling);
+			return FALSE;
+		}
+		// 将计费信息保存到链表中
+		for (i = 0, node = billingList; i < nCount; i++)
+		{
+			// 为当前节点分配内存
+			cur = (lpBillingNode)malloc(sizeof(BillingNode));
 
-    for (i = 0; i < nCount; i++) {
-        // 内存分配 - 增加失败检查
-        cur = (lpBillingNode)malloc(sizeof(BillingNode));
-        if (!cur) {
-            // 清理已分配内存
-            releaseBillingList();
-            free(pBilling);
-            return FALSE;
-        }
-
-        // 初始化新节点
-        cur->data = pBilling[i];
-        cur->next = NULL;
-
-        // 安全添加节点到链表尾部
-        node->next = cur;
-        node = cur; // 更新末尾指针
-    }
-
-    free(pBilling);
-    return TRUE;
+			// 如果分配失败则在返回FALSE前，需要释放pBilling内存
+			if (cur == NULL)
+			{
+				free(pBilling);
+				return FALSE;
+			}
+			// 初始化新的空间，全部复制为零
+			memset(cur, 0, sizeof(BillingNode));
+			// 将数据添加到节点中
+			cur->data = pBilling[i];
+			cur->next = NULL;
+			// 将节点添加到链表中
+			if (node == 0)
+			{
+				exit(1);
+			}
+			node->next = cur;
+			node = cur;
+		}
+		free(pBilling);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 // 函数名:queryBilling
