@@ -208,16 +208,18 @@ int doSettle(const char *pName, const char *pPwd, SettleInfo *pInfo)
 	dbAmount = getAmount(pBilling->tStart);
 
 	// 如果金额小于消费金额，则不能进行下机
+	// 应当允许余额为负补充充值
 	fBalance = pCard->fBalance - (float)dbAmount;
-	if (fBalance < 0)
-	{
-		return ENOUGHMONEY;
-	}
+	// if (fBalance < 0)
+	// {
+	// 	return ENOUGHMONEY;
+	// }
 
 	// 更新卡信息
 	pCard->fBalance = fBalance;	   // 余额
 	pCard->nStatus = 0;			   // 状态
 	pCard->tLastTime = time(NULL); // 上次使用时间
+	pCard->fTotalUse += (float)dbAmount;// 统计消费金额进入累计金额中
 
 	// 更新文件中的卡信息
 	if (FALSE == updateCard(pCard, CARDPATH, nIndex))
@@ -300,9 +302,14 @@ int doAddMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 	// 判断该卡是否未使用或正在上机，只有未使用才能进行充值操作
 	else if (pCard->nStatus != 2 || pCard->nStatus != 3)
 	{
+		if(pMoneyInfo->fMoney <= 0)
+		{
+			printf("充值金额不能为负！！！\n");
+			return FALSE;
+		}
 	// 如果可以充值，更新卡信息
 	pCard->fBalance += pMoneyInfo->fMoney;
-	pCard->fTotalUse += pMoneyInfo->fMoney;
+	//pCard->fTotalUse += pMoneyInfo->fMoney;
 	// 更新文件中的卡信息文件
 	if (FALSE == updateCard(pCard, CARDPATH, nIndex))
 	{
@@ -383,7 +390,7 @@ int doRefundMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 	{
 		// 组装退费信息
 		strcpy(pMoneyInfo->aCardName, sMoney.aCardName);
-		pMoneyInfo->fMoney = sMoney.fMoney;
+		//pMoneyInfo->fMoney = sMoney.fMoney;
 		pMoneyInfo->fBalance = pCard->fBalance;
 
 		return TRUE;
