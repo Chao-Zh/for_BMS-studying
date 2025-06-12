@@ -6,6 +6,7 @@
 #include <time.h>
 #include <ctime>
 #include <cstring>
+#include <math.h>
 
 #include "model.h"
 #include "menu.h"
@@ -13,6 +14,8 @@
 #include "global.h"
 #include "tool.h"
 #include "service.h"
+#include "billing_service.h"
+#include "billing_file.h"
 
 using namespace std;
 
@@ -721,59 +724,285 @@ void getLeftAlignFormat(char *fmt, int targetWidth, const char *str) {
 }
 
 
-// 函数名cardCount
-// 功能：统计总共有多少卡，有多少可用卡，把所有的卡号信息与状态信息输出
-// 参数：void
-// 返回值：void
+// // 函数名cardCount
+// // 功能：统计总共有多少卡，有多少可用卡，把所有的卡号信息与状态信息输出
+// // 参数：void
+// // 返回值：void
+// void cardCount() {
+//     int total = 0;
+//     int available = 0;
+//     int index = 0; // 用于接收queryCards返回的实际卡数量
+
+//     // 调用queryCards获取所有卡（pName传空字符串匹配所有卡）
+//     Card *pCards = queryCards("", &index); 
+
+//     if (pCards == NULL || index == 0) {
+//         printf("--- 没有找到任何卡信息 ---\n");
+//         return;
+//     }
+
+//     printf("\n------ 卡状态统计 ------\n");
+
+//     // 遍历所有卡
+//     for (int i = 0; i < index; i++) {
+//         total++;
+
+//         // 状态字段为nStatus，0,1表示可用.3,4为不可用
+//         if (pCards[i].nStatus == 0) { 
+//             available++;
+//         }
+// 		if (pCards[i].nStatus == 1) { 
+//             available++;
+//         }
+
+//         // 输出卡信息（卡号字段为aName）
+//         printf("卡号：%-20s 状态：", pCards[i].aName);
+//         switch(pCards[i].nStatus) {
+//             case 0: 
+//                 printf("可用,未上机\n");
+//                 break;
+//             case 1: 
+//                 printf("可用,正在上机\n");
+//                 break;
+//             case 2: 
+//                 printf("已注销\n");
+//                 break;
+// 			case 3: 
+//                 printf("失效\n");
+//                 break;
+//             default:
+//                 printf("未知状态(%d)\n", pCards[i].nStatus);
+//         }
+//     }
+
+//     printf("\n总计:%d 张卡\n可用卡:%d 张\n", total, available);
+
+//     // 释放queryCards分配的内存
+//     free(pCards);
+// }
 void cardCount() {
-    int total = 0;
-    int available = 0;
-    int index = 0; // 用于接收queryCards返回的实际卡数量
-
-    // 调用queryCards获取所有卡（pName传空字符串匹配所有卡）
-    Card *pCards = queryCards("", &index); 
-
-    if (pCards == NULL || index == 0) {
-        printf("--- 没有找到任何卡信息 ---\n");
-        return;
-    }
-
-    printf("\n------ 卡状态统计 ------\n");
-
-    // 遍历所有卡
-    for (int i = 0; i < index; i++) {
-        total++;
-
-        // 状态字段为nStatus，0,1表示可用.3,4为不可用
-        if (pCards[i].nStatus == 0) { 
-            available++;
-        }
-		if (pCards[i].nStatus == 1) { 
-            available++;
-        }
-
-        // 输出卡信息（卡号字段为aName）
-        printf("卡号：%-20s 状态：", pCards[i].aName);
-        switch(pCards[i].nStatus) {
-            case 0: 
-                printf("可用,未上机\n");
+    int choice;
+    do {
+        printf("\n\t\t*查询统计*\n");
+        printf("\t1. 按卡号和时间段查询消费记录\n");
+        printf("\t2. 按时间段统计总营业额\n");
+        printf("\t3. 统计年度分月营业额\n");
+        printf("\t0. 返回主菜单\n");
+        printf("请选择操作: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                queryConsumption();
                 break;
-            case 1: 
-                printf("可用,正在上机\n");
+            case 2:
+                totalRevenue();
                 break;
-            case 2: 
-                printf("已注销\n");
+            case 3:
+                monthlyRevenue();
                 break;
-			case 3: 
-                printf("失效\n");
+            case 0:
+                printf("返回主菜单...\n");
                 break;
             default:
-                printf("未知状态(%d)\n", pCards[i].nStatus);
+                printf("无效选择，请重新输入！\n");
+        }
+    } while (choice != 0);
+}
+
+
+// 以下进行拓展功能实现！
+// 辅助函数：检查时间是否在指定范围内
+int isTimeInRange(time_t checkTime, time_t startTime, time_t endTime) {
+    return (checkTime >= startTime) && (checkTime <= endTime);
+}
+
+// 查询消费记录
+void queryConsumption() {
+    char cardName[30];
+    char startTimeStr[20];
+    char endTimeStr[20];
+    
+    printf("请输入卡号: ");
+    scanf("%s", cardName);
+    printf("请输入起始时间(格式: YYYY-MM-DD HH:MM): ");
+    getchar(); // 消耗换行符
+    fgets(startTimeStr, sizeof(startTimeStr), stdin);
+    startTimeStr[strcspn(startTimeStr, "\n")] = 0; // 移除换行符
+    printf("请输入结束时间(格式: YYYY-MM-DD HH:MM): ");
+    fgets(endTimeStr, sizeof(endTimeStr), stdin);
+    endTimeStr[strcspn(endTimeStr, "\n")] = 0; // 移除换行符
+    
+    time_t startTime = stringToTime(startTimeStr);
+    time_t endTime = stringToTime(endTimeStr);
+    
+    // 验证时间范围
+    if (startTime == (time_t)-1 || endTime == (time_t)-1) {
+        printf("时间格式错误！\n");
+        return;
+    }
+    if (difftime(endTime, startTime) <= 0) {
+        printf("结束时间必须晚于开始时间！\n");
+        return;
+    }
+    
+    // 获取计费记录数量
+    int billingCount = getBillingCount(BILLINGPATH);
+    if (billingCount <= 0) {
+        printf("没有找到计费记录！\n");
+        return;
+    }
+    
+    // 读取所有计费记录
+    Billing* billings = (Billing*)malloc(sizeof(Billing) * billingCount);
+    if (!readBilling(billings, BILLINGPATH)) {
+        printf("读取计费记录失败！\n");
+        free(billings);
+        return;
+    }
+    
+    printf("\n消费记录查询结果 (卡号: %s, 时间段: %s 至 %s)\n", cardName, startTimeStr, endTimeStr);
+    printf("---------------------------------------------------------------------\n");
+    printf("%-20s %-20s %-20s %-10s\n", "卡号", "上机时间", "下机时间", "消费金额");
+    printf("---------------------------------------------------------------------\n");
+    
+    int found = 0;
+    for (int i = 0; i < billingCount; i++) {
+        if (billings[i].nDel == 0 && billings[i].nStatus == 1 && // 有效且已结算的记录
+            strcmp(billings[i].aCardName, cardName) == 0 &&
+            isTimeInRange(billings[i].tEnd, startTime, endTime)) {
+            
+            char startStr[20], endStr[20];
+            timeToString(billings[i].tStart, startStr);
+            timeToString(billings[i].tEnd, endStr);
+            
+            printf("%-20s %-20s %-20s ¥%-10.2f\n", 
+                   billings[i].aCardName, startStr, endStr, billings[i].fAmount);
+            found = 1;
         }
     }
+    
+    if (!found) {
+        printf("没有找到符合条件的消费记录！\n");
+    }
+    
+    printf("---------------------------------------------------------------------\n");
+    free(billings);
+}
 
-    printf("\n总计:%d 张卡\n可用卡:%d 张\n", total, available);
+// 统计总营业额
+void totalRevenue() {
+    char startTimeStr[20];
+    char endTimeStr[20];
+    
+    printf("请输入起始时间(格式: YYYY-MM-DD HH:MM): ");
+    getchar(); // 消耗换行符
+    fgets(startTimeStr, sizeof(startTimeStr), stdin);
+    startTimeStr[strcspn(startTimeStr, "\n")] = 0; // 移除换行符
+    printf("请输入结束时间(格式: YYYY-MM-DD HH:MM): ");
+    fgets(endTimeStr, sizeof(endTimeStr), stdin);
+    endTimeStr[strcspn(endTimeStr, "\n")] = 0; // 移除换行符
+    
+    time_t startTime = stringToTime(startTimeStr);
+    time_t endTime = stringToTime(endTimeStr);
+    
+    // 验证时间范围
+    if (startTime == (time_t)-1 || endTime == (time_t)-1) {
+        printf("时间格式错误！\n");
+        return;
+    }
+    if (difftime(endTime, startTime) <= 0) {
+        printf("结束时间必须晚于开始时间！\n");
+        return;
+    }
+    
+    // 获取计费记录数量
+    int billingCount = getBillingCount(BILLINGPATH);
+    if (billingCount <= 0) {
+        printf("没有找到计费记录！\n");
+        return;
+    }
+    
+    // 读取所有计费记录
+    Billing* billings = (Billing*)malloc(sizeof(Billing) * billingCount);
+    if (!readBilling(billings, BILLINGPATH)) {
+        printf("读取计费记录失败！\n");
+        free(billings);
+        return;
+    }
+    
+    double totalAmount = 0.0;
+    int count = 0;
+    
+    for (int i = 0; i < billingCount; i++) {
+        if (billings[i].nDel == 0 && billings[i].nStatus == 1 && // 有效且已结算的记录
+            isTimeInRange(billings[i].tEnd, startTime, endTime)) {
+            
+            totalAmount += billings[i].fAmount;
+            count++;
+        }
+    }
+    
+    printf("\n营业额统计结果 (时间段: %s 至 %s)\n", startTimeStr, endTimeStr);
+    printf("--------------------------------------------------\n");
+    printf("总消费记录数: %d\n", count);
+    printf("总营业额: ¥%.2f\n", totalAmount);
+    printf("--------------------------------------------------\n");
+    
+    free(billings);
+}
 
-    // 释放queryCards分配的内存
-    free(pCards);
+// 统计月度营业额
+void monthlyRevenue() {
+    int year;
+    printf("请输入要统计的年份(YYYY): ");
+    scanf("%d", &year);
+    
+    // 获取计费记录数量
+    int billingCount = getBillingCount(BILLINGPATH);
+    if (billingCount <= 0) {
+        printf("没有找到计费记录！\n");
+        return;
+    }
+    
+    // 读取所有计费记录
+    Billing* billings = (Billing*)malloc(sizeof(Billing) * billingCount);
+    if (!readBilling(billings, BILLINGPATH)) {
+        printf("读取计费记录失败！\n");
+        free(billings);
+        return;
+    }
+    
+    // 初始化月份营业额数组
+    double monthlyAmount[12] = {0};
+    int monthlyCount[12] = {0};
+    
+    for (int i = 0; i < billingCount; i++) {
+        if (billings[i].nDel == 0 && billings[i].nStatus == 1) {
+            // 获取时间结构
+            struct tm* timeinfo = localtime(&(billings[i].tEnd));
+            int recordYear = timeinfo->tm_year + 1900;
+            int month = timeinfo->tm_mon;
+            
+            if (recordYear == year && month >= 0 && month < 12) {
+                monthlyAmount[month] += billings[i].fAmount;
+                monthlyCount[month]++;
+            }
+        }
+    }
+    
+    printf("\n%d年度分月营业额统计\n", year);
+    printf("--------------------------------------------------\n");
+    printf("月份     消费记录数       营业额\n");
+    printf("--------------------------------------------------\n");
+    
+    const char* monthNames[] = {"一月", "二月", "三月", "四月", "五月", "六月",
+                               "七月", "八月", "九月", "十月", "十一月", "十二月"};
+    
+    for (int i = 0; i < 12; i++) {
+        printf("%-8s %-12d ¥%-12.2f\n", monthNames[i], monthlyCount[i], monthlyAmount[i]);
+    }
+    
+    printf("--------------------------------------------------\n");
+    free(billings);
 }

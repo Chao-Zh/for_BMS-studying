@@ -370,7 +370,7 @@ int doRefundMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 
 	// 更新卡信息
 	pCard->fBalance = 0;		  // 余额
-	pCard->fTotalUse -= fBalance; // 累计金额
+	//pCard->fTotalUse -= fBalance; // 累计金额更新
 
 	// 更新文件中的卡信息
 	if (FALSE == updateCard(pCard, CARDPATH, nIndex))
@@ -390,7 +390,7 @@ int doRefundMoney(const char *pName, const char *pPwd, MoneyInfo *pMoneyInfo)
 	{
 		// 组装退费信息
 		strcpy(pMoneyInfo->aCardName, sMoney.aCardName);
-		//pMoneyInfo->fMoney = sMoney.fMoney;
+		pMoneyInfo->fMoney = sMoney.fMoney;
 		pMoneyInfo->fBalance = pCard->fBalance;
 
 		return TRUE;

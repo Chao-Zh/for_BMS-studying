@@ -12,4 +12,7 @@ void refundMoney();               // 退费
 void annul();                     // 注销卡
 int calcDisplayWidth(const char *str);           // 计算字符串的显示宽度（中文2，英文1）
 void getLeftAlignFormat(char *fmt, int targetWidth, const char *str);        // 生成左对齐格式字符串（如 "%-20s")
-void cardCount();
+void cardCount();              // 统计可用卡
+void queryConsumption();       // 查询消费记录
+void totalRevenue();           // 统计总营业额
+void monthlyRevenue();         // 统计月度营业额
